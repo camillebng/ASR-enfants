@@ -1,5 +1,6 @@
 --extra-index-url https://download.pytorch.org/whl/cu126
 flask
+flask-cors
 whisperx @ git+https://github.com/m-bain/whisperX.git@5f2f9d4320dd93a7d12f5ba2495eef7e0a5af963
 torch==2.8.0+cu126
 torch-audiomentations==0.12.0
