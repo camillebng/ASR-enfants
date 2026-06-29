@@ -2,7 +2,7 @@
 title Lancement de l'application de transcription
 
 echo 1. Navigation vers le dossier projet 
-cd /d "C:\Users\cbeno\Documents\stage_asr_2026\interface_web"
+cd /d "%~dp0"
 
 echo 2. Activation de l'environnement virtuel
 call "venv\Scripts\activate.bat"
