@@ -29,11 +29,11 @@ if %DETEC_PATH% equ 0 (set NVIDIA_OK=1) else if %DETEC_DIRECT% equ 0 (set NVIDIA
 
 if %NVIDIA_OK% equ 1 (
     echo [OK] Carte NVIDIA active trouvee.
-    pip install -r requirements-cuda.txt
+    pip install -r requirements-gpu.txt
 ) else (
     echo [INFO] Pas de carte NVIDIA (ou pilotes absents). Repli sur CPU.
     pip install -r requirements-cpu.txt
-)
+)²
 
 echo ==========================================
 echo  Installation terminee avec succes !
