@@ -1,4 +1,7 @@
 @echo off
+
+cd /d "%~dp0"
+
 echo ==========================================
 echo  1. Creation de l'environnement virtuel...
 echo ==========================================
@@ -33,7 +36,7 @@ if %NVIDIA_OK% equ 1 (
 ) else (
     echo [INFO] Pas de carte NVIDIA (ou pilotes absents). Repli sur CPU.
     pip install -r requirements-cpu.txt
-)²
+)
 
 echo ==========================================
 echo  Installation terminee avec succes !
