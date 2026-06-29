@@ -7,7 +7,7 @@ echo  1. Creation de l'environnement virtuel...
 echo ==========================================
 
 if not exist venv (
-    python -3.11.9 -m venv venv
+    py -3.11 -m venv venv
     echo Environnement cree !
 ) else (
     echo L'environnement venv existe deja.
