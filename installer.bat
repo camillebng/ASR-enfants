@@ -32,10 +32,10 @@ if %DETEC_PATH% equ 0 (set NVIDIA_OK=1) else if %DETEC_DIRECT% equ 0 (set NVIDIA
 
 if %NVIDIA_OK% equ 1 (
     echo [OK] Carte NVIDIA active trouvee.
-    venv\Scripts\pip install -r requirements-gpu.txt
+    venv\Scripts\pip install -r requirements_gpu.txt
 ) else (
     echo [INFO] Pas de carte NVIDIA ou pilotes absents - Repli sur CPU.
-    venv\Scripts\pip install -r requirements-cpu.txt
+    venv\Scripts\pip install -r requirements_cpu.txt
 )
 
 echo ==========================================
