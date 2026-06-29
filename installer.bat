@@ -1,0 +1,41 @@
+@echo off
+echo ==========================================
+echo  1. Creation de l'environnement virtuel...
+echo ==========================================
+
+if not exist venv (
+    python -m venv venv
+    echo Environnement cree !
+) else (
+    echo L'environnement venv existe deja.
+)
+
+echo ==========================================
+echo  2. Activation et mise a jour de PIP...
+echo ==========================================
+call venv\Scripts\activate.bat
+python -m pip install --upgrade pip
+
+echo ==========================================
+echo  3. Installation des librairies...
+echo ==========================================
+
+where nvidia-smi >nul 2>&1
+set DETEC_PATH=%errorlevel%
+
+if exist "C:\Program Files\NVIDIA Corporation\Nvidia-smi\nvidia-smi.exe" (set DETEC_DIRECT=0) else (set DETEC_DIRECT=1)
+
+if %DETEC_PATH% equ 0 (set NVIDIA_OK=1) else if %DETEC_DIRECT% equ 0 (set NVIDIA_OK=1) else (set NVIDIA_OK=0)
+
+if %NVIDIA_OK% equ 1 (
+    echo [OK] Carte NVIDIA active trouvee.
+    pip install -r requirements-cuda.txt
+) else (
+    echo [INFO] Pas de carte NVIDIA (ou pilotes absents). Repli sur CPU.
+    pip install -r requirements-cpu.txt
+)
+
+echo ==========================================
+echo  Installation terminee avec succes !
+echo ==========================================
+pause

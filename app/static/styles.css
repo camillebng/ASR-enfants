@@ -1,0 +1,258 @@
+body{
+    background-color: #f9f8f7;
+}
+
+h2 {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 20px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+
+    color: #536972;
+
+}
+
+main{
+    font-family: 'Inter',system-ui, sans-serif;
+    font-size: 14px;
+    font-weight: 450;
+    color:#464646;
+}
+
+.app-layout{
+    display:flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-left:2%;
+    margin-right:2%;
+}
+
+section{
+    background: white;
+    border: solid 0.5px;
+    border-radius: 10px;
+    border-color: rgb(222, 222, 222);
+    padding:15px;
+    margin-bottom: 20px;
+}
+
+/* Panneaux */
+.left-panels, .right-panels{
+    display:flex;
+    flex-direction: column;
+    width:50%;
+    margin:15px;
+}
+
+.files-panel{
+    display: flex;
+    flex-direction: column;
+}
+
+#file-list-display {
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
+.parameters-panel {
+    background: white;
+    border: solid 0.5px;
+    border-radius: 10px;
+    border-color: rgb(222, 222, 222);
+    padding:15px;
+}
+
+.parameters-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px 24px;
+}
+
+.exec-button {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#transcr-btn {
+    background-color: #536972;
+    color: #f9f8f7;
+    width: 50%;
+    margin:10px;
+    border-radius: 12px;
+    border: 1px solid #536972;
+    padding: 10px 12px;
+    display: inline-flex;
+    gap: 5px;
+    cursor: pointer;
+    justify-content: center;
+    box-shadow: 1.3px 1.3px 1.3px #506269;
+}
+
+#transcr-btn:hover {
+    background-color: #b87458;
+    border-color: #b87458;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    color: #8c9699;
+}
+
+#execution-console {
+    width: 98%;
+    height: 180px;          
+    background-color: #e7e7e7; 
+    color: #464646;         
+    font-family: 'Courier New', Courier, monospace; 
+    padding: 10px;
+    border: dotted 2px rgb(175, 175, 175);
+    border-radius: 15px;
+    resize: none;         
+    overflow-y: auto;      
+}
+
+/* Elements de formulaire */
+    select,
+    input[type="number"] {
+    background-color: rgb(244, 245, 246);
+    border-radius: 12px;
+    border: 1px solid rgb(222, 222, 222);
+    padding: 10px 12px;
+    width: 100%;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+
+#interrupt-btn{
+    background-color: #b87458;
+    border:1px solid #b87458;
+    border-radius: 8px;
+    color:#f9f8f7;
+    box-shadow: 1.3px 1.3px 1.3px #9d644c;
+    padding: 5px 8px;
+    margin:5px;
+    cursor:pointer;
+    display: inline-flex;
+    justify-content: center;
+}
+
+#interrupt-btn:hover{
+    background-color: rgb(244, 245, 246);
+    border: 1px solid rgb(222, 222, 222);
+    color: #1e1e1e;
+    box-shadow: 1.3px 1.3px 1.3px rgb(216, 216, 216);
+}
+
+/* Sélection des fichiers */
+input::file-selector-button {
+    background-color: rgb(244, 245, 246);
+    border-radius: 8px;
+    border: 1px solid rgb(222, 222, 222);
+    box-shadow: 0.5px 0.5px 0.5px rgb(216, 216, 216);
+    padding: 5px 8px;
+    margin:5px;
+    cursor:pointer;
+}
+
+input::file-selector-button:hover{
+    background-color: #b87458;
+    border-color: #b87458;
+    color:#f9f8f7;
+}
+
+#clear-btn {
+    width:30px;
+    display:inline-flex;
+    justify-content: left;
+}
+
+/* Onglets pour la fenêtre de résultats */
+    input[type="radio"] {
+    display: none;
+}
+
+.tabcontent {
+    display: none;
+    border: dotted 2px rgb(222, 222, 222);
+    border-radius: 15px;
+    margin-top: 10px;
+    padding: 10px;  
+    max-height: 50%;
+    overflow-y: auto;
+}
+
+#tab-transcript:checked ~ #content-transcript {
+    display: block; 
+}
+
+#tab-wer:checked ~ #content-wer {
+    display: block; 
+}
+
+.results-btns {
+    background-color: rgb(244, 245, 246);
+    border-radius: 8px;
+    border: 1px solid rgb(222, 222, 222);
+    box-shadow: 0.5px 0.5px 0.5px rgb(216, 216, 216);
+    padding: 5px 8px;
+    margin:5px;
+    cursor:pointer;
+}
+
+.results-btns:hover {
+    background-color: #b87458;
+    border-color: #b87458;
+    color:#f9f8f7;
+}
+
+/* Style des headers des onglets quand sélectionnés */
+#tab-transcript:checked ~ .tab-headers label[for="tab-transcript"] {
+    background-color: white;
+    color: rgb(40, 40, 41);
+    border:1px solid rgba(222, 222, 222, 0.586);
+    border-radius: 20px;
+    padding:8px;
+    box-shadow: 0.5px 0.5px 0.5px rgb(216, 216, 216);
+}
+
+#tab-wer:checked ~ .tab-headers label[for="tab-wer"] {
+    background-color: white;
+    color: rgb(40, 40, 41);
+    border:1px solid rgba(222, 222, 222, 0.586);
+    border-radius: 20px;
+    padding:8px;
+    box-shadow: 0.5px 0.5px 0.5px rgb(216, 216, 216);
+}
+
+.tab-headers {
+    background-color: rgb(244, 245, 246);
+    border:  1px solid rgb(222, 222, 222);
+    border-radius: 25px;
+    width:fit-content;
+    padding:7px;
+}
+
+.tablinks {
+    display:inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap:2px;
+    color: #818181;
+    cursor: pointer;
+    padding-left:5px;
+    padding-right:5px;
+}
