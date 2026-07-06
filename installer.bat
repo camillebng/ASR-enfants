@@ -23,6 +23,8 @@ echo ==========================================
 echo  3. Installation des librairies...
 echo ==========================================
 
+where ffmpeg >nul 2>nul || winget install --id Gyan.FFmpeg --silent --exact --accept-source-agreements --accept-package-agreements
+
 where nvidia-smi >nul 2>&1
 set DETEC_PATH=%errorlevel%
 

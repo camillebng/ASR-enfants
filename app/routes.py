@@ -16,27 +16,44 @@ app.config['max_content_length'] = 505 * 1024 * 1024
 processus_transcription = None
 interruption_evenement = Event()
 
-def transcribe(chemins_audios, modele, device, compute, language, dossier_temp):
+def transcribe(chemins_audios, system_type, model_size, language, device, compute_type, batch_size, temperature, compression_ratio_threshold, beam_size, dossier_temp):
     try:
-        model = whisperx.load_model(modele, device, compute_type=compute)
+        if device == "cpu":
+            batch_size = 1
+
+        options_asr = {
+            "temperatures": [temperature],
+            "beam_size": beam_size,
+            "compression_ratio_threshold": compression_ratio_threshold
+        }
+
+        model = whisperx.load_model(
+            whisper_arch=model_size, 
+            device=device, 
+            compute_type=compute_type,
+            asr_options=options_asr
+        )
         
         texte_final = ""
         for chemin_audio in chemins_audios:
             if interruption_evenement.is_set():
                 return
             audio = whisperx.load_audio(chemin_audio)
-            result = model.transcribe(audio, language=language)
+
+            result = model.transcribe(
+                audio, 
+                language=language, 
+                batch_size=batch_size
+            )
             
-            nom_fichier = os.path.basename(chemin_audio)
-            texte_final += f"[{nom_fichier}]\n"
             for segment in result["segments"]:
                 texte_final += segment["text"] + " "
-            texte_final += "\n\n"
 
         if not interruption_evenement.is_set():
             chemin_resultat = os.path.join(dossier_temp, 'resultat.txt')
             with open(chemin_resultat, "w", encoding="utf-8") as f:
                 f.write(texte_final.strip())
+
     except Exception as e:
         if not interruption_evenement.is_set():
             chemin_erreur = os.path.join(dossier_temp, 'erreur.txt')
@@ -50,12 +67,17 @@ def index():
 @app.route('/transcribe', methods=['POST'])
 def route_transcribe_stream():
     global processus_transcription
-
-    modele = request.form.get('modele')
-    device = request.form.get('device')
-    compute = request.form.get('compute')
+    
+    system_type = request.form.get('systeme')
+    model_size = request.form.get('modele')
     language = request.form.get('language')
-
+    device = request.form.get('device')
+    compute_type = request.form.get('compute-type')
+    batch_size = int(request.form.get('batch-size') or 16)
+    temperature = float(request.form.get('temperature') or 0.0)
+    compression_ratio_threshold = float(request.form.get('compression-ratio-threshold') or 3.5)
+    beam_size = int(request.form.get('beam-size') or 5)
+    
     dossier_temp = os.path.join(app.root_path, 'temp')
     os.makedirs(dossier_temp, exist_ok=True)
     
@@ -68,8 +90,20 @@ def route_transcribe_stream():
             fichier.save(chemin)
             chemins_audios.append(chemin)
 
+    fichier_ref = request.files.get('texte')
+    texte_reference = None
+    if fichier_ref and fichier_ref.filename != '':
+        texte_reference = fichier_ref.read().decode('utf-8')
+
     def generer_logs():
         global processus_transcription
+
+        if processus_transcription != None and processus_transcription.is_alive():
+            for chemin in chemins_audios:
+                if os.path.exists(chemin):
+                    os.remove(chemin)
+            yield "data: ❌ Erreur : Une transcription est déjà en cours \n\n"
+            return
 
         yield f"data: 📁 {len(chemins_audios)} fichier(s) audio sauvegardé(s)\n\n"
         time.sleep(0.5)
@@ -79,7 +113,7 @@ def route_transcribe_stream():
         interruption_evenement.clear()
         processus_transcription = Thread(
             target=transcribe, 
-            args=(chemins_audios, modele, device, compute, language, dossier_temp)
+            args=(chemins_audios, system_type, model_size, language, device, compute_type, batch_size, temperature, compression_ratio_threshold, beam_size, dossier_temp)
         )
         processus_transcription.start()
 
@@ -102,7 +136,14 @@ def route_transcribe_stream():
                 if os.path.exists(chemin):
                     os.remove(chemin)
 
-            donnees_json = json.dumps({"statut": "FIN_TRANSCRIPTION", "texte": texte_recupere})
+            reponse_dict = {"statut": "FIN_TRANSCRIPTION", "texte": texte_recupere}
+            
+            if texte_reference:
+                resultats_bruts = calculer_wer(texte_reference, texte_recupere, [])
+                if isinstance(resultats_bruts, dict) and 'alignement_lignes' in resultats_bruts:
+                    reponse_dict["alignement_lignes"] = resultats_bruts['alignement_lignes']
+
+            donnees_json = json.dumps(reponse_dict)
             yield f"data: {donnees_json}\n\n"
             
         elif os.path.exists(chemin_erreur):
@@ -119,7 +160,7 @@ def route_transcribe_stream():
                 if os.path.exists(chemin):
                     os.remove(chemin)
             yield "data: > ⚠️ Transcription interrompue par l'utilisateur\n\n"
-
+            
     return Response(generer_logs(), mimetype='text/event-stream')
 
 @app.route('/interrupt', methods=['POST'])
@@ -150,7 +191,7 @@ def calculer_wer_route():
     print(liste_codages)
     print(texte_reference)
     print(texte_pred)
-    # Calcul brut des scores
+    
     resultats_bruts = calculer_wer(texte_reference, texte_pred, liste_codages)
 
     wer, cer = 0.0, 0.0

@@ -9,12 +9,12 @@ def fusionner_transcriptions(liste_pred):
     return " ".join(clean_txt)
 
 
-def calculer_wer(reference,prediction,codes_users=None):
+def calculer_wer(reference, prediction, codes_users=None):
     if codes_users is None:
         codes_users = []
 
     reference = reference.lower()
-    prediction  =prediction.lower()
+    prediction = prediction.lower()
     
     clean_ref = re.sub("[.,?!;:']", " ", reference)
     clean_pred = re.sub("[.,?!;:']", " ", prediction)
@@ -51,22 +51,21 @@ def calculer_wer(reference,prediction,codes_users=None):
     len_ref_wer = len(ref_wer)
     len_pred_wer = len(pred_wer)
 
-    ligne_precedente = [[0, 0, 0, 0] for _ in range(len_pred_wer + 1)]
-    ligne_courante = [[0, 0, 0, 0] for _ in range(len_pred_wer + 1)]
+    matrice = [[[0, 0, 0, 0] for _ in range(len_pred_wer + 1)] for _ in range(len_ref_wer + 1)]
 
     # Remplissage initial de la ligne 0 (Insertions)
     for j in range(1, len_pred_wer + 1):
-        ligne_precedente[j] = [j, 0, 0, j]
+        matrice[0][j] = [j, 0, 0, j]
 
     for i in range(1, len_ref_wer + 1):
         # Remplissage initial de la colonne 0 (Suppressions)
-        ligne_courante[0] = [i, 0, i, 0]
+        matrice[i][0] = [i, 0, i, 0]
         mot_ref = ref_wer[i-1]
 
         for j in range(1, len_pred_wer + 1):
             mot_pred = pred_wer[j-1]
             # Calcul de la diagonale (substitution ou identique)
-            cout_diag_prec = ligne_precedente[j-1][0]
+            cout_diag_prec = matrice[i-1][j-1][0]
 
             if mot_ref == mot_pred:
                 diagonale = cout_diag_prec + 0
@@ -79,10 +78,10 @@ def calculer_wer(reference,prediction,codes_users=None):
                 diagonale = cout_diag_prec + 1
 
             # Calcul de la verticale (suppression)
-            verticale = ligne_precedente[j][0] + 1
+            verticale = matrice[i-1][j][0] + 1
 
             # Calcul de l'horizontale (insertion)
-            horizontale = ligne_courante[j-1][0] + 1
+            horizontale = matrice[i][j-1][0] + 1
 
             # Choix du chemin le plus court
             cout_minimal = min(diagonale, verticale, horizontale)
@@ -90,33 +89,31 @@ def calculer_wer(reference,prediction,codes_users=None):
             # Mise à jour des compteurs
             if cout_minimal == diagonale:
                 if mot_ref != mot_pred and mot_ref not in codages:
-                    substitution = ligne_precedente[j-1][1] + 1
+                    substitution = matrice[i-1][j-1][1] + 1
                 else:
-                    substitution = ligne_precedente[j-1][1]
-                deletion = ligne_precedente[j-1][2]
-                insertion = ligne_precedente[j-1][3]
+                    substitution = matrice[i-1][j-1][1]
+                deletion = matrice[i-1][j-1][2]
+                insertion = matrice[i-1][j-1][3]
 
             elif cout_minimal == verticale:
-                substitution = ligne_precedente[j][1]
-                deletion = ligne_precedente[j][2] + 1
-                insertion = ligne_precedente[j][3]
+                substitution = matrice[i-1][j][1]
+                deletion = matrice[i-1][j][2] + 1
+                insertion = matrice[i-1][j][3]
 
             else:
-                substitution = ligne_courante[j-1][1]
-                deletion = ligne_courante[j-1][2]
-                insertion = ligne_courante[j-1][3] + 1
+                substitution = matrice[i][j-1][1]
+                deletion = matrice[i][j-1][2]
+                insertion = matrice[i][j-1][3] + 1
 
             # Sauvegarde finale de toutes les valeurs dans la case courante
-            ligne_courante[j] = [cout_minimal, substitution, deletion, insertion]
-
-        ligne_precedente = list(ligne_courante)
+            matrice[i][j] = [cout_minimal, substitution, deletion, insertion]
 
 
     len_ref_cer = len(ref_cer)
     len_pred_cer = len(pred_cer)
 
     # Extraction des résultats finaux
-    resultat_final = ligne_courante[len_pred_wer]
+    resultat_final = matrice[len_ref_wer][len_pred_wer]
     total_sub = resultat_final[1]
     total_del = resultat_final[2]
     total_ins = resultat_final[3]
@@ -130,10 +127,60 @@ def calculer_wer(reference,prediction,codes_users=None):
     print(f"Insertions    : {total_ins}")
     print(f"Score WER final : {wer:.2%}")
 
+    i = len_ref_wer
+    j = len_pred_wer
+    mots_ref_alignes = []
+    mots_pred_alignes = []
+
+    while i > 0 or j > 0:
+        if i == 0:
+            mots_ref_alignes.append("*")
+            mots_pred_alignes.append(pred_wer[j-1])
+            j -= 1
+        elif j == 0:
+            mots_ref_alignes.append(ref_wer[i-1])
+            mots_pred_alignes.append("*")
+            i -= 1
+        else:
+            cout_actuel = matrice[i][j][0]
+            if ref_wer[i-1] == pred_wer[j-1] or ref_wer[i-1] in codages:
+                cout_diag = 0
+            else:
+                cout_diag = 1
+                
+            if cout_actuel == matrice[i-1][j-1][0] + cout_diag:
+                mots_ref_alignes.append(ref_wer[i-1])
+                mots_pred_alignes.append(pred_wer[j-1])
+                i -= 1
+                j -= 1
+            elif cout_actuel == matrice[i-1][j][0] + 1:
+                mots_ref_alignes.append(ref_wer[i-1])
+                mots_pred_alignes.append("*")
+                i -= 1
+            else:
+                mots_ref_alignes.append("*")
+                mots_pred_alignes.append(pred_wer[j-1])
+                j -= 1
+
+    mots_ref_alignes.reverse()
+    mots_pred_alignes.reverse()
+
+    # --- MODIFICATION DE L'AFFICHAGE ICI ---
+    mots_par_ligne = 10
+    lignes_alignees = []
+    for k in range(0, len(mots_ref_alignes), mots_par_ligne):
+        bloc_ref = mots_ref_alignes[k:k + mots_par_ligne]
+        bloc_pred = mots_pred_alignes[k:k + mots_par_ligne]
+        lignes_alignees.append({
+            "num_ligne": (k // mots_par_ligne) + 1,
+            "ref": " ".join(bloc_ref),
+            "pred": " ".join(bloc_pred)
+        })
 
 
     # ***** CALCUL DU CER *****
 
+    # Créer matrice à deux dimensions
     ligne_precedente_cer = [[0, 0, 0, 0] for _ in range(len_pred_cer + 1)]
     ligne_courante_cer = [[0, 0, 0, 0] for _ in range(len_pred_cer + 1)]
 
@@ -195,5 +242,6 @@ def calculer_wer(reference,prediction,codes_users=None):
         "wer": wer,
         "cer": cer,
         "details_wer": {"sub": total_sub, "del": total_del, "ins": total_ins},
-        "details_cer": {"sub": total_sub_cer, "del": total_del_cer, "ins": total_ins_cer}
+        "details_cer": {"sub": total_sub_cer, "del": total_del_cer, "ins": total_ins_cer},
+        "alignement_lignes": lignes_alignees
     }

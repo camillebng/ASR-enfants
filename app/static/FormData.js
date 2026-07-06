@@ -1,3 +1,4 @@
+let texteTranscriptionComplet = "";
 
 const selectSystem = document.getElementById('model-type');
 const selectModel = document.getElementById('model-size');
@@ -29,6 +30,27 @@ const btnWer = document.getElementById('wer-btn');
 const codes = document.getElementById('codage');
 const zoneResultats = document.getElementById('wer-results');
 
+function formaterTranscrParLignes(texte, maxMots, maxLignes) {
+    let mots = texte.replace(/\s+/g, ' ').trim().split(' ');
+    let lignes = [];
+
+    if (mots.length === 1 && mots[0] === "") return "";
+
+    for (let i = 0; i < mots.length; i += maxMots) {
+        let morceau = mots.slice(i, i + maxMots).join(' ');
+        lignes.push(morceau);
+    }
+
+    let lignesLimitees = lignes.slice(0, maxLignes);
+    let resultat = lignesLimitees.join('\n');
+
+    if (lignes.length > maxLignes) {
+        resultat += '\n...';
+    }
+
+    return resultat;
+}
+
 if (btnWer) {
     btnWer.addEventListener('click', async function (evenement) {
         evenement.preventDefault(); 
@@ -38,10 +60,10 @@ if (btnWer) {
             consoleTextarea.scrollTop = consoleTextarea.scrollHeight;
         }
 
-        const textePred = zoneTranscription ? zoneTranscription.innerText.trim() : "";
+        const textePred = texteTranscriptionComplet.trim();
 
-        if (!inputRef || inputRef.files.length === 0 || textePred === "" || textePred === "La transcription apparaîtra ici") {
-            alert("Veuillez sélectionner un fichier de référence ET vous assurer qu'une transcription est affichée à l'écran.");
+        if (!inputRef || inputRef.files.length === 0 || textePred === "") {
+            alert("Veuillez sélectionner un fichier de référence ET vous assurer qu'une transcription a été générée.");
             return;
         }
 
@@ -107,7 +129,7 @@ if (btnInterrupt) {
         try {
             const reponse = await fetch('/interrupt', {
                 method: 'POST',
-            });
+                });
             
             if (consoleTextarea) {
                 consoleTextarea.value += "⚠️ Transcription interrompue\n";
@@ -157,11 +179,37 @@ async function lancerTranscription(formData) {
                             
                             if (donnees.statut === 'FIN_TRANSCRIPTION') {
                                 if (zoneTranscription) {
-                                    zoneTranscription.innerText = donnees.texte;
+                                    let texteOriginal = donnees.texte;
+                                    texteTranscriptionComplet = texteOriginal;
+                                    
+                                    if (donnees.alignement_lignes) {
+                                        let htmlAlignement = "";
+
+                                        const maxLignes = 10;
+                                        const lignesAAfficher = donnees.alignement_lignes.slice(0, maxLignes);
+
+                                        lignesAAfficher.forEach(ligne => {
+                                            htmlAlignement += `
+                                            <div class="bloc-alignement">
+                                                <div><strong>Ligne ${ligne.num_ligne}</strong></div>
+                                                <div class="ligne-ref">REF : ${ligne.ref}</div>
+                                                <div class="ligne-pred">PRED: ${ligne.pred}</div>
+                                            </div>
+                                            <hr>`;
+                                        });
+
+                                        zoneTranscription.innerHTML = `
+                                        <h3>🔍 Alignement des mots</h3>
+                                        <div class="zone-defilement-alignement">
+                                            ${htmlAlignement}
+                                        </div>`;
+                                    }
                                 }
+                                
                                 consoleTextarea.value += "> ✨ Transcription terminée avec succès\n";
                             }
-                        } catch (e) {
+                        } 
+                        catch (e) {
                             console.error("Erreur lors du traitement du JSON :", e);
                             consoleTextarea.value += `> ${message}\n`;
                         }
@@ -174,7 +222,8 @@ async function lancerTranscription(formData) {
             });
         }
         if (btnTranscrire) btnTranscrire.disabled = false;
-    } catch(erreur) {
+    } 
+    catch(erreur) {
         consoleTextarea.value += `❌ Erreur : ${erreur.message}\n`;
         if (btnTranscrire) btnTranscrire.disabled = false;
     }
@@ -202,11 +251,11 @@ if (btnTranscrire) {
         if (selectModel) formData.append('modele', selectModel.value);
         if (selectLang) formData.append('language', selectLang.value);
         if (selectDevice) formData.append('device', selectDevice.value);
-        if (selectCompute) formData.append('compute', selectCompute.value);
-        if (selectBatch) formData.append('batch', selectBatch.value);
-        if (selectTemp) formData.append('temp', selectTemp.value);
-        if (selectCompression) formData.append('compression', selectCompression.value);
-        if (selectBeam) formData.append('beam', selectBeam.value);
+        if (selectCompute) formData.append('compute-type', selectCompute.value);
+        if (selectBatch) formData.append('batch-size', selectBatch.value);
+        if (selectTemp) formData.append('temperature', selectTemp.value);
+        if (selectCompression) formData.append('compression-ratio-threshold', selectCompression.value);
+        if (selectBeam) formData.append('beam-size', selectBeam.value);
 
         const fichiersTries = Array.from(inputAudio.files).sort((a, b) => {
             return a.name.localeCompare(b.name, undefined, {numeric: true});
@@ -228,9 +277,9 @@ if (btnExporter) {
     btnExporter.addEventListener('click', function() {
         if (!zoneTranscription || !selectFormat) return;
 
-        const texteBrut = zoneTranscription.innerText;
+        const texteBrut = texteTranscriptionComplet.trim() || zoneTranscription.innerText.trim();
 
-        if (texteBrut === "La transcription apparaîtra ici" || texteBrut === "Transcription en cours..." || texteBrut.trim() === "") {
+        if (texteBrut === "La transcription apparaîtra ici" || texteBrut === "Transcription en cours..." || texteBrut === "") {
             alert("Il n'y a aucune transcription valide à exporter pour le moment.");
             return;
         }

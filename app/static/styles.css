@@ -219,6 +219,27 @@ input::file-selector-button:hover{
     color:#f9f8f7;
 }
 
+/* Affichage des transcriptions alignées */
+.bloc-alignement {
+    margin-bottom:10px;
+}
+
+.zone-defilement-alignement {
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: #f9f8f7;
+    padding:10px;
+    border:1px solid rgb(222, 222, 222);
+}
+
+.ligne-ref {
+    color:green;
+}
+
+.ligne-pred {
+    color:orangered;
+}
+
 /* Style des headers des onglets quand sélectionnés */
 #tab-transcript:checked ~ .tab-headers label[for="tab-transcript"] {
     background-color: white;
