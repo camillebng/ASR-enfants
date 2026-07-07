@@ -1,13 +1,18 @@
 # Prérequis
-## Python 
-Il est nécessaire d'installer Python dans sa version `3.11.9`. En suivant ce lien, https://www.python.org/downloads/release/python-3119/, télécharger le fichier d'installation en 64-bits. A la fin de l'installation, laisser la case **"Add Python to PATH" décochée**.
 
-## Pilotes et librairies NVIDIA
-Si vous possédez une carte graphique NVIDIA, il est conseillé de lancer la transcription dessus pour réduire les temps de calcul.
+## 1. Miniconda
+Il est nécessaire d'installer l'environnement Python via Miniconda.
+* Téléchargez l'installeur 64-bits pour Windows ici : https://docs.anaconda.com/miniconda/
+* Lancez l'installation et laissez toutes les options par défaut.
 
-1. Mettre les pilotes graphiques à jour : https://www.nvidia.com/fr-fr/drivers/
-2. Installer le toolkit CUDA 12.6 : https://developer.nvidia.com/cuda-12-6-0-download-archive?target_os=Windows&target_arch=x86_64&target_version=11&target_type=exe_local
+## 2. Pilotes et librairies NVIDIA (Optionnel mais recommandé)
+Si vous possédez une carte graphique NVIDIA, cela permettra de réduire les temps de calculs.
+1. Mettez vos pilotes graphiques à jour : https://www.nvidia.com/fr-fr/drivers/
+2. Installez le toolkit CUDA 12.6 : https://developer.nvidia.com/cuda-12-6-0-download-archive?target_os=Windows&target_arch=x86_64&target_version=11&target_type=exe_local
 
-# Installation 
-* Dans le dossier de l'application, lancer le fichier `installer.bat` et laisser le script s'exécuter. 
-* Puis lancer `start.bat` pour commencer à utiliser l'application. Il est parfois nécessaire de recharger la page pour que l'application s'affiche.
+# Installation et Lancement
+
+1. Dans le dossier de l'application, lancez le fichier `installer.bat` et laissez le script s'exécuter jusqu'au bout.
+2. Lancez ensuite `start.bat` pour démarrer le serveur de l'application dans le navigateur.
+
+*Note : si la page s'ouvre sur une erreur, essayez de rafraîchir la page.*
