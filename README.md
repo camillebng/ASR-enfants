@@ -2,7 +2,7 @@
 
 ## 1. Miniconda
 Il est nécessaire d'installer l'environnement Python via Miniconda.
-* Téléchargez l'installeur 64-bits pour Windows ici : https://docs.anaconda.com/miniconda/
+* Téléchargez l'installeur 64-bits pour Windows ici : https://www.anaconda.com/download/success
 * Lancez l'installation et laissez toutes les options par défaut.
 
 ## 2. Pilotes et librairies NVIDIA (Optionnel mais recommandé)
