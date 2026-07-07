@@ -1,6 +1,6 @@
 # Prérequis
 ## Python 
-Il est nécessaire d'installer Python dans sa version `3.11.9`. En suivant ce lien, https://www.python.org/downloads/release/python-3119/, télécharger le fichier d'installation en 64-bits. A la fin de l'installation, **cocher la case "Add Python to PATH"**.
+Il est nécessaire d'installer Python dans sa version `3.11.9`. En suivant ce lien, https://www.python.org/downloads/release/python-3119/, télécharger le fichier d'installation en 64-bits. A la fin de l'installation, laisser la case **"Add Python to PATH" décochée**.
 
 ## Pilotes et librairies NVIDIA
 Si vous possédez une carte graphique NVIDIA, il est conseillé de lancer la transcription dessus pour réduire les temps de calcul.
@@ -10,4 +10,4 @@ Si vous possédez une carte graphique NVIDIA, il est conseillé de lancer la tra
 
 # Installation 
 * Dans le dossier de l'application, lancer le fichier `installer.bat` et laisser le script s'exécuter. 
-* Puis lancer `start.bat` pour commencer à utiliser l'application.
+* Puis lancer `start.bat` pour commencer à utiliser l'application. Il est parfois nécessaire de recharger la page pour que l'application s'affiche.
