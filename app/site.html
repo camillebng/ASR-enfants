@@ -112,13 +112,21 @@
                     <label for="sounds">Choisir les fichiers sons à transcrire</label>
                     <input type="file" id="sounds" accept=".wav" multiple/> 
 
-                    <button id="clear-btn" type="button" style="display: none;">
+                    <button id="clear-btn" class="hidden" type="button" >
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-icon lucide-x">
                                 <path d="M18 6 6 18"/>
                                 <path d="m6 6 12 12"/>
                             </svg>
+                            Supprimer les fichiers
                     </button>    
                     <ul id="file-list-display"></ul> 
+
+                    <div id="praat-scripts" class="hidden">
+                        Souhaitez-vous scinder votre fichier son ? (Conseillé pour les enregistrements de +10-15min)
+                        <button id="split-btn" type="button">
+
+                        </button>
+                    </div>
                     
                 </section>
                 <section class="results-panel">
@@ -161,7 +169,7 @@
                         <div class="tabcontent" id="content-wer">
                             <div>
                                 Quels codages sont à éliminer du calcul ? <br>
-                                <input type="text" id="codage"/> <br>
+                                <input type="text" id="codage" placeholder="ex. xxx prenom lieu"/> <br>
                                 <button id="wer-btn" class="results-btns">Calculer le WER/CER</button>
                                 <div id="wer-results"></div>
                             </div>    

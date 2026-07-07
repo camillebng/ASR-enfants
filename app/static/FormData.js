@@ -16,6 +16,7 @@ const fileList = document.getElementById('file-list-display');
 const btnTranscrire = document.getElementById('transcr-btn');
 const btnInterrupt = document.getElementById('interrupt-btn');
 const btnVider = document.getElementById('clear-btn');
+const btnScinder = document.getElementById('split-btn');
 
 const consoleTextarea = document.getElementById('execution-console');
 
@@ -199,9 +200,15 @@ async function lancerTranscription(formData) {
                                         });
 
                                         zoneTranscription.innerHTML = `
-                                        <h3>🔍 Alignement des mots</h3>
+                                        <h3>Visualisation de la transcription</h3>
                                         <div class="zone-defilement-alignement">
                                             ${htmlAlignement}
+                                        </div>`;
+                                    } else {
+                                        zoneTranscription.innerHTML = `
+                                        <h3>Visualisation de la transcription</h3>
+                                        <div class="zone-texte-simple">
+                                            <p>${texteOriginal}</p>
                                         </div>`;
                                     }
                                 }
@@ -338,7 +345,27 @@ if (inputAudio) {
             });
         }
         if (btnVider) {
-            btnVider.style.display = inputAudio.files.length > 0 ? "inline-block" : "none";
+            if (inputAudio.files.length > 0) {
+                btnVider.classList.remove("hidden");
+            } else {
+                btnVider.classList.add("hidden");
+            }
+        }
+        if (btnScinder) {
+            if (inputAudio.files.length === 1) {
+                const urlTemporaire = URL.createObjectURL(inputAudio.files[0]);
+                const audioVirtuel = new Audio(urlTemporaire);
+                audioVirtuel.addEventListener('loadedmetadata', function() {
+                    if (audioVirtuel.duration > 900) {
+                        btnScinder.classList.remove("hidden");
+                    } else {
+                        btnScinder.classList.add("hidden");
+                    }
+                    URL.revokeObjectURL(urlTemporaire);
+                });
+            } else {
+                btnScinder.classList.add("hidden");
+            }
         }
     });
 }
@@ -348,6 +375,7 @@ if (btnVider) {
         evenement.preventDefault();
         if (inputAudio) inputAudio.value = "";
         if (fileList) fileList.innerHTML = "";
-        btnVider.style.display = "none";
+        btnVider.classList.add("hidden");
+        if (btnScinder) btnScinder.classList.add("hidden");
     });
 }
