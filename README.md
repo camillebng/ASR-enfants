@@ -10,4 +10,4 @@ Si vous possédez une carte graphique NVIDIA, il est conseillé de lancer la tra
 
 # Installation 
 * Dans le dossier de l'application, lancer le fichier `installer.bat` et laisser le script s'exécuter. 
-* Puis lancer `start.bat` pour commencer à utiliser l'application.
+* Puis lancer `start.bat` pour commencer à utiliser l'application. Il est parfois nécessaire de recharger la page pour que l'application s'affiche.
