@@ -3,7 +3,7 @@
 ## 1. Miniconda
 Il est nécessaire d'installer l'environnement Python via Miniconda.
 * Téléchargez l'installeur 64-bits pour Windows ici : https://www.anaconda.com/download/success
-* Lancez l'installation et laissez toutes les options par défaut.
+* Lancez l'installation et choisissez votre dossier utilisateur comme emplacement du dossier miniconda3. Si miniconda3 s'est téléchargé dans le dossier AppData par défaut, déplacez-le simplement dans le dossier User. Pour le reste, laissez toutes les options par défaut.
 
 ## 2. Pilotes et librairies NVIDIA (Optionnel mais recommandé)
 Si vous possédez une carte graphique NVIDIA, cela permettra de réduire les temps de calculs.
