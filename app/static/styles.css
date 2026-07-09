@@ -136,7 +136,7 @@ section{
     z-index: 10;
     
 
-    bottom: 130%;
+    top: 130%;
     left: 50%;
     transform: translateX(-50%);
     
@@ -161,7 +161,7 @@ section{
 
 .tooltip-container:hover::after {
     opacity: 1;
-    transform: translateX(-50%) translateY(-4px); 
+    transform: translateX(-50%) translateY(4px); 
 }
 
 #execution-console {
