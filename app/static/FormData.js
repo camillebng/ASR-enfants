@@ -169,7 +169,7 @@ if (btnWer) {
         const textePred = texteTranscriptionComplet.trim();
 
         if (!inputRef || inputRef.files.length === 0 || textePred === "") {
-            alert("Veuillez sélectionner un fichier de référence ET vous assurer qu'une transcription a été générée.");
+            alert("Vaudrez sélectionner un fichier de référence ET vous assurer qu'une transcription a été générée.");
             return;
         }
 
@@ -334,7 +334,7 @@ if (btnExporter) {
         }
         else if (formatChoisi === "textgrid") { 
             if (!textGridTranscriptionComplet) {
-                alert("Aucune donnée TextGrid disponible. Le découpage était-il bien activé ?");
+                alert("Aucune donnée TextGrid disponible. La transcription a-t-elle été générée ?");
                 return;
             }
             contenuFichier = textGridTranscriptionComplet;

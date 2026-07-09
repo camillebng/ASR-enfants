@@ -1,4 +1,3 @@
-
 # ***** ***** LIBRAIRIES ***** *****
 
 import torch
@@ -113,6 +112,13 @@ def transcribe(chemins_audios, chemin_tg, system_type, model_size, language, dev
                     "xmax": intervalles_originaux[i]["xmax"],
                     "text": texte_chunk
                 })
+            else:
+                for segment in result["segments"]:
+                    resultats_tg.append({
+                        "xmin": segment["start"],
+                        "xmax": segment["end"],
+                        "text": segment["text"].strip()
+                    })
 
         # Sauvegarde finale des résultats dans des fichiers temporaires 
         if not interruption_evenement.is_set():
@@ -122,7 +128,7 @@ def transcribe(chemins_audios, chemin_tg, system_type, model_size, language, dev
                 f.write(texte_final.strip())
 
             # Fichier textgrid aligné
-            if activer_decoupage and resultats_tg:
+            if resultats_tg:
                 chemin_tg_out = os.path.join(dossier_temp, 'resultat.TextGrid')
                 xmax_total = resultats_tg[-1]["xmax"] if resultats_tg else 0
                 with open(chemin_tg_out, "w", encoding="utf-8") as f:
@@ -163,9 +169,8 @@ def extraire_intervalles_tg(chemin_tg):
     return intervalles
 
 
-# =========================================================================
 # ***** ***** LIAISON FRONTEND ***** *****
-# =========================================================================
+
 
 # Page d'accueil
 @app.route('/')
