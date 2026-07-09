@@ -3,6 +3,7 @@ flask
 flask-cors
 jiwer
 textgrid
+praat-parselmouth
 https://github.com/m-bain/whisperX/archive/5f2f9d4320dd93a7d12f5ba2495eef7e0a5af963.zip
 torch==2.8.0+cu126
 torch-audiomentations==0.12.0

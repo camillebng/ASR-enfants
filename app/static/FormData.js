@@ -1,151 +1,51 @@
+// ***** ***** STOCKAGE DES TRANSCRIPTIONS ***** *****
 let texteTranscriptionComplet = "";
+let textGridTranscriptionComplet = ""; 
 
+
+
+// ***** ***** SELECTEUR D'ELEMENTS ***** *****
+
+// Paramètres du modèle
 const selectSystem = document.getElementById('model-type');
 const selectModel = document.getElementById('model-size');
-const selectLang = document.getElementById('lang');
 const selectDevice = document.getElementById('device-type');
-const selectCompute = document.getElementById('compute-type');
-const selectBatch = document.getElementById('batch-size');
 const selectTemp = document.getElementById('temperature');
 const selectCompression = document.getElementById('compression');
 const selectBeam = document.getElementById('beam-size');
 
+// Gestion des fichiers 
 const inputAudio = document.getElementById('sounds');
 const fileList = document.getElementById('file-list-display');
 
+// Commandes de transcription et d'outils
 const btnTranscrire = document.getElementById('transcr-btn');
 const btnInterrupt = document.getElementById('interrupt-btn');
 const btnVider = document.getElementById('clear-btn');
 const btnScinder = document.getElementById('split-btn');
+const inputTextGrid = document.getElementById('textgrid'); 
+const conteneurPraat = document.getElementById('praat-scripts');
 
+// Affichage de l'exécution et de la transcription
 const consoleTextarea = document.getElementById('execution-console');
-
 const zoneTranscription = document.getElementById('transcript-text');
+
+// Exportation des résultats
 const selectFormat = document.getElementById('export-format');
 const btnExporter = document.getElementById('download-btn');
 
-const limite_taille_audio = 100 * 1024 * 1024;
-
+// Evaluation des résultats (CER/CER)
 const inputRef = document.getElementById('transcr-ref');
 const btnWer = document.getElementById('wer-btn');
 const codes = document.getElementById('codage');
 const zoneResultats = document.getElementById('wer-results');
 
-function formaterTranscrParLignes(texte, maxMots, maxLignes) {
-    let mots = texte.replace(/\s+/g, ' ').trim().split(' ');
-    let lignes = [];
 
-    if (mots.length === 1 && mots[0] === "") return "";
 
-    for (let i = 0; i < mots.length; i += maxMots) {
-        let morceau = mots.slice(i, i + maxMots).join(' ');
-        lignes.push(morceau);
-    }
 
-    let lignesLimitees = lignes.slice(0, maxLignes);
-    let resultat = lignesLimitees.join('\n');
+// ***** ***** ECHANGES AVEC LE SERVEUR ***** *****
 
-    if (lignes.length > maxLignes) {
-        resultat += '\n...';
-    }
-
-    return resultat;
-}
-
-if (btnWer) {
-    btnWer.addEventListener('click', async function (evenement) {
-        evenement.preventDefault(); 
-
-        if (consoleTextarea) {
-            consoleTextarea.value += "> 📊 Requête de calcul WER envoyée...\n";
-            consoleTextarea.scrollTop = consoleTextarea.scrollHeight;
-        }
-
-        const textePred = texteTranscriptionComplet.trim();
-
-        if (!inputRef || inputRef.files.length === 0 || textePred === "") {
-            alert("Veuillez sélectionner un fichier de référence ET vous assurer qu'une transcription a été générée.");
-            return;
-        }
-
-        if (inputRef.files[0].size > limite_taille_audio) {
-            alert(`Le fichier de référence est trop volumineux.`);
-            return;
-        }
-
-        try {
-            const paquetWer = new FormData();
-
-            paquetWer.append('reference_file', inputRef.files[0]);
-            
-            if (codes) {
-                paquetWer.append('codes_users', codes.value);
-            }
-
-            const fichierPrediction = new File([textePred], "prediction.txt", { type: "text/plain;charset=utf-8" });
-            paquetWer.append('prediction_files', fichierPrediction);
-
-            if (zoneResultats) {
-                zoneResultats.innerHTML = "<p>⏳ Calcul des scores en cours...</p> ";
-            }
-
-            const reponse = await fetch('/calcul-wer', {
-                method: 'POST',
-                body: paquetWer
-            });
-
-            if (!reponse.ok) {
-                throw new Error(`Erreur serveur : ${reponse.status}`);
-            }
-
-            const resultats = await reponse.json();
-
-            if (zoneResultats) {
-                zoneResultats.innerHTML = `
-                <h3>📊 Résultats du Calcul</h3>
-                <p><strong>Score WER final :</strong> ${(resultats.wer * 100).toFixed(2)}%</p>
-                <p><strong>Score CER final :</strong> ${(resultats.cer * 100).toFixed(2)}%</p>
-                <ul>
-                    <li>Substitutions (WER) : ${resultats.details_wer.sub}</li>
-                    <li>Suppressions (WER) : ${resultats.details_wer.del}</li>
-                    <li>Insertions (WER) : ${resultats.details_wer.ins}</li>
-                </ul>
-                `;
-            }
-        }
-        catch (erreur) {
-            console.error("Erreur lors du calcul :", erreur);
-            if (zoneResultats) {
-                zoneResultats.innerHTML = `<p style="color: red;">❌ Une erreur est survenue : ${erreur.message}</p>`;
-            }
-        }
-    });
-}
-
-if (btnInterrupt) {
-    btnInterrupt.addEventListener('click', async function (evenement) {
-        evenement.preventDefault(); 
-        btnInterrupt.disabled = true;
-
-        try {
-            const reponse = await fetch('/interrupt', {
-                method: 'POST',
-                });
-            
-            if (consoleTextarea) {
-                consoleTextarea.value += "⚠️ Transcription interrompue\n";
-            }
-            btnInterrupt.disabled = false;
-        }
-        catch (erreur) {
-            if (consoleTextarea) {
-                consoleTextarea.value += `❌ Erreur : ${erreur.message}\n`;
-            }
-            btnInterrupt.disabled = false;
-        }
-    });
-}
-
+// Lance la transcription et met à jour l'interface
 async function lancerTranscription(formData) {
     if (!consoleTextarea) return;
     consoleTextarea.value = "$ python mon_script.py\n";
@@ -182,11 +82,11 @@ async function lancerTranscription(formData) {
                                 if (zoneTranscription) {
                                     let texteOriginal = donnees.texte;
                                     texteTranscriptionComplet = texteOriginal;
+                                    textGridTranscriptionComplet = donnees.textgrid || ""; 
                                     
                                     if (donnees.alignement_lignes) {
                                         let htmlAlignement = "";
-
-                                        const maxLignes = 10;
+                                        const maxLignes = 20;
                                         const lignesAAfficher = donnees.alignement_lignes.slice(0, maxLignes);
 
                                         lignesAAfficher.forEach(ligne => {
@@ -236,6 +136,115 @@ async function lancerTranscription(formData) {
     }
 }
 
+
+
+
+
+// ***** ***** GESTIONNAIRES D'ÉVÉNEMENTS ***** *****
+
+// Activation de l'option de découpage des fichiers sons
+if (btnScinder) {
+    btnScinder.addEventListener('click', function (evenement) {
+        evenement.preventDefault();
+        btnScinder.classList.toggle('active');
+
+        if (btnScinder.classList.contains('active')) {
+            btnScinder.style.border = "2px solid #b87458"; 
+        } else {
+            btnScinder.style.border = ""; 
+        }
+    });
+}
+
+// Calcul des scores WER/CER
+if (btnWer) {
+    btnWer.addEventListener('click', async function (evenement) {
+        evenement.preventDefault(); 
+
+        if (consoleTextarea) {
+            consoleTextarea.value += "> 📊 Requête de calcul WER envoyée...\n";
+            consoleTextarea.scrollTop = consoleTextarea.scrollHeight;
+        }
+
+        const textePred = texteTranscriptionComplet.trim();
+
+        if (!inputRef || inputRef.files.length === 0 || textePred === "") {
+            alert("Veuillez sélectionner un fichier de référence ET vous assurer qu'une transcription a été générée.");
+            return;
+        }
+
+        try {
+            const paquetWer = new FormData();
+            paquetWer.append('reference_file', inputRef.files[0]);
+            
+            if (codes) {
+                paquetWer.append('codes_users', codes.value);
+            }
+
+            const fichierPrediction = new File([textePred], "prediction.txt", { type: "text/plain;charset=utf-8" });
+            paquetWer.append('prediction_files', fichierPrediction);
+
+            if (zoneResultats) {
+                zoneResultats.innerHTML = "<p>⏳ Calcul des scores en cours...</p> ";
+            }
+
+            const reponse = await fetch('/calcul-wer', {
+                method: 'POST',
+                body: paquetWer
+            });
+
+            if (!reponse.ok) {
+                throw new Error(`Erreur serveur : ${reponse.status}`);
+            }
+
+            const resultats = await reponse.json();
+
+            if (zoneResultats) {
+                zoneResultats.innerHTML = `
+                <h3>📊 Résultats du Calcul</h3>
+                <p><strong>Score WER final :</strong> ${(resultats.wer * 100).toFixed(2)}%</p>
+                <p><strong>Score CER final :</strong> ${(resultats.cer * 100).toFixed(2)}%</p>
+                <ul>
+                    <li>Substitutions (WER) : ${resultats.details_wer.sub}</li>
+                    <li>Suppressions (WER) : ${resultats.details_wer.del}</li>
+                    <li>Insertions (WER) : ${resultats.details_wer.ins}</li>
+                </ul>
+                `;
+            }
+        }
+        catch (erreur) {
+            console.error("Erreur lors du calcul :", erreur);
+            if (zoneResultats) {
+                zoneResultats.innerHTML = `<p style="color: red;">❌ Une erreur est survenue : ${erreur.message}</p>`;
+            }
+        }
+    });
+}
+
+// Interruption de la transcription
+if (btnInterrupt) {
+    btnInterrupt.addEventListener('click', async function (evenement) {
+        evenement.preventDefault(); 
+        btnInterrupt.disabled = true;
+
+        try {
+            await fetch('/interrupt', { method: 'POST' });
+            
+            if (consoleTextarea) {
+                consoleTextarea.value += "⚠️ Transcription interrompue\n";
+            }
+            btnInterrupt.disabled = false;
+        }
+        catch (erreur) {
+            if (consoleTextarea) {
+                consoleTextarea.value += `❌ Erreur : ${erreur.message}\n`;
+            }
+            btnInterrupt.disabled = false;
+        }
+    });
+}
+
+// Déclenchement de la transcription globale
 if (btnTranscrire) {
     btnTranscrire.addEventListener('click', function(evenement) {
         evenement.preventDefault();
@@ -245,9 +254,9 @@ if (btnTranscrire) {
             return;
         }
 
-        const tropGrand = Array.from(inputAudio.files).some(fichier => fichier.size > limite_taille_audio);
-        if (tropGrand) {
-            alert("Un ou plusieurs fichiers audio dépassent la limite autorisée de 100 Mo par fichier.");
+        const decoupageActif = btnScinder && btnScinder.classList.contains('active');
+        if (decoupageActif && (!inputTextGrid || inputTextGrid.files.length === 0)) {
+            alert("Veuillez sélectionner un fichier TextGrid pour effectuer le découpage.");
             return;
         }
 
@@ -256,13 +265,14 @@ if (btnTranscrire) {
         let formData = new FormData();
         if (selectSystem) formData.append('systeme', selectSystem.value);
         if (selectModel) formData.append('modele', selectModel.value);
-        if (selectLang) formData.append('language', selectLang.value);
         if (selectDevice) formData.append('device', selectDevice.value);
-        if (selectCompute) formData.append('compute-type', selectCompute.value);
-        if (selectBatch) formData.append('batch-size', selectBatch.value);
         if (selectTemp) formData.append('temperature', selectTemp.value);
         if (selectCompression) formData.append('compression-ratio-threshold', selectCompression.value);
         if (selectBeam) formData.append('beam-size', selectBeam.value);
+
+        if (btnScinder) {
+            formData.append('activer_decoupage', btnScinder.classList.contains('active'));
+        }
 
         const fichiersTries = Array.from(inputAudio.files).sort((a, b) => {
             return a.name.localeCompare(b.name, undefined, {numeric: true});
@@ -276,10 +286,15 @@ if (btnTranscrire) {
             formData.append('texte', inputRef.files[0]);
         }
 
+        if (inputTextGrid && inputTextGrid.files && inputTextGrid.files.length > 0) {
+            formData.append('textgrid', inputTextGrid.files[0]);
+        }
+
         lancerTranscription(formData);
     });
 }
 
+// Génération des fichiers d'export
 if (btnExporter) {
     btnExporter.addEventListener('click', function() {
         if (!zoneTranscription || !selectFormat) return;
@@ -317,6 +332,15 @@ if (btnExporter) {
             typeMime = "text/srt;charset=utf-8";
             nomExtension = "srt";
         }
+        else if (formatChoisi === "textgrid") { 
+            if (!textGridTranscriptionComplet) {
+                alert("Aucune donnée TextGrid disponible. Le découpage était-il bien activé ?");
+                return;
+            }
+            contenuFichier = textGridTranscriptionComplet;
+            typeMime = "text/plain;charset=utf-8";
+            nomExtension = "TextGrid";
+        }
 
         const blob = new Blob([contenuFichier], { type: typeMime });
         const url = URL.createObjectURL(blob);
@@ -333,6 +357,7 @@ if (btnExporter) {
     });
 }
 
+// Affichage et tri de la liste des fichiers, gestion des boutons "Vider" et "Scinder"
 if (inputAudio) {
     inputAudio.addEventListener('change', function() {
         if (fileList) {
@@ -351,31 +376,35 @@ if (inputAudio) {
                 btnVider.classList.add("hidden");
             }
         }
-        if (btnScinder) {
-            if (inputAudio.files.length === 1) {
-                const urlTemporaire = URL.createObjectURL(inputAudio.files[0]);
-                const audioVirtuel = new Audio(urlTemporaire);
-                audioVirtuel.addEventListener('loadedmetadata', function() {
-                    if (audioVirtuel.duration > 900) {
-                        btnScinder.classList.remove("hidden");
-                    } else {
-                        btnScinder.classList.add("hidden");
-                    }
-                    URL.revokeObjectURL(urlTemporaire);
-                });
+
+        if (conteneurPraat) {
+            if (inputAudio.files.length > 0) {
+                conteneurPraat.classList.remove("hidden");
             } else {
-                btnScinder.classList.add("hidden");
+                conteneurPraat.classList.add("hidden");
+                if (btnScinder) {
+                    btnScinder.classList.remove("active");
+                    btnScinder.style.border = "";
+                }
             }
         }
     });
 }
 
+// Nettoyage des fichiers chargés 
 if (btnVider) {
     btnVider.addEventListener('click', function(evenement) {
         evenement.preventDefault();
         if (inputAudio) inputAudio.value = "";
         if (fileList) fileList.innerHTML = "";
         btnVider.classList.add("hidden");
-        if (btnScinder) btnScinder.classList.add("hidden");
+
+        if (conteneurPraat) {
+            conteneurPraat.classList.add("hidden");
+        }
+        if (btnScinder) {
+            btnScinder.classList.remove("active");
+            btnScinder.style.border = "";
+        }
     });
 }

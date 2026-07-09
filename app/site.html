@@ -40,7 +40,15 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="device-type">Matériel</label>
+                            <label for="device-type">Matériel
+                                <span class="tooltip-container" data-tooltip="L'unité sur laquelle va s'exécuter la transcription. Si vous en possédez une, l'exécution sur carte graphique (NVIDIA) est recommandée.">
+                                        <svg xmlns="http://www.w3.org/2000/svg"  width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info">
+                                            <circle cx="12" cy="12" r="10"/>
+                                            <path d="M12 16v-4"/>
+                                            <path d="M12 8h.01"/>
+                                        </svg>
+                                </span>
+                            </label>
                             <select name="device-type" id="device-type">
                                 <option value="cpu">Processeur (CPU)</option>
                                 <option value="cuda">Carte graphique NVIDIA</option>
@@ -48,35 +56,42 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="compute-type">Type de calcul</label>
-                            <select name="compute-type" id="compute-type">
-                                <option value="float16">float16</option>
-                                <option value="float32">float32</option>
-                                <option value="int8">int8</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="batch-size">Taille du lot</label>
-                            <select name="batch-size" id="batch-size">
-                                <option value="16">16</option>
-                                <option value="8">8</option>
-                                <option value="4">4</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="temperature">Température</label>
+                            <label for="temperature">Température
+                                <span class="tooltip-container" data-tooltip="Niveau de créativité du modèle. Plus la température est élevée plus le modèle va être créatif et générer des hypothèses moins probables.">
+                                        <svg xmlns="http://www.w3.org/2000/svg"  width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info">
+                                            <circle cx="12" cy="12" r="10"/>
+                                            <path d="M12 16v-4"/>
+                                            <path d="M12 8h.01"/>
+                                        </svg>
+                                </span>
+                            </label>
                             <input type="number" id="temperature" min="0" max="1" value="0.0" step="0.1">
                         </div>
 
                         <div class="form-group">
-                            <label for="compression">Taux de seuil de compression</label>
+                            <label for="compression">Taux de seuil de compression
+                                <span class="tooltip-container" data-tooltip="Permet de limiter les hallucinations de type répétitions de mots. Plus la valeur est basse plus le filtre va être sévère.">
+                                        <svg xmlns="http://www.w3.org/2000/svg"  width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info">
+                                            <circle cx="12" cy="12" r="10"/>
+                                            <path d="M12 16v-4"/>
+                                            <path d="M12 8h.01"/>
+                                        </svg>
+                                </span>
+                            </label>
                             <input type="number" id="compression" min="1.5" max="5" value="3.5" step="0.1">
                         </div>
 
                         <div class="form-group">
-                            <label for="beam-size">Largeur du faisceau</label>
+                            <label for="beam-size">
+                                Largeur du faisceau
+                                <span class="tooltip-container" data-tooltip="Augmente la précision des phrases mais réduit la vitesse de calcul. 1=vitesse maximale (recommandé pour CPU), 5=précision optimale (recommandé pour gpu)">
+                                    <svg xmlns="http://www.w3.org/2000/svg"  width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <path d="M12 16v-4"/>
+                                        <path d="M12 8h.01"/>
+                                    </svg>
+                                </span>
+                            </label>
                             <input type="number" id="beam-size" min="1" max="10" value="5" step="1">
                         </div>
 
@@ -120,11 +135,23 @@
                             Supprimer les fichiers
                     </button>    
                     <ul id="file-list-display"></ul> 
-
+                    <br><br>
                     <div id="praat-scripts" class="hidden">
-                        Souhaitez-vous scinder votre fichier son ? (Conseillé pour les enregistrements de +10-15min)
-                        <button id="split-btn" type="button">
-
+                        <span class="tooltip-container" data-tooltip="Le fichier .textgrid doit être prétraité en délimitant au préalable les prises de parole à transcrire (voir README pour plus de détails)">
+                            Souhaitez-vous scinder votre fichier son ? 
+                            <svg xmlns="http://www.w3.org/2000/svg"  width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M12 16v-4"/>
+                                <path d="M12 8h.01"/>
+                            </svg>
+                        </span>
+                        <br><br>
+                        <label for="textgrid">Choisir le .textgrid associé au son</label>
+                        <br>
+                        <input type="file" id="textgrid" accept=".textgrid"/> 
+                        <br><br>
+                        <button id="split-btn" class="results-btns" type="button">
+                            Scinder les fichiers
                         </button>
                     </div>
                     
@@ -160,6 +187,7 @@
                             <label for="export-format">Format d'export :</label>
                             <select id="export-format" style="margin-right: 10px; padding: 5px;">
                                 <option value="txt">Texte brut (.txt)</option>
+                                <option value="textgrid">.textgrid (Praat)</option>
                             </select>
 
                             <button id="download-btn" class="results-btns" style="padding: 5px 15px;">Exporter</button>
@@ -168,8 +196,19 @@
                         </div>
                         <div class="tabcontent" id="content-wer">
                             <div>
-                                Quels codages sont à éliminer du calcul ? <br>
+                                Quels codages sont à éliminer du calcul ?
+                                <span class="tooltip-container" data-tooltip="Les codages saisis sont éliminés du calcul du WER/CER en divisant leur nombre au nombre total de substitutions.">
+                                    <svg xmlns="http://www.w3.org/2000/svg"  width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <path d="M12 16v-4"/>
+                                        <path d="M12 8h.01"/>
+                                    </svg>
+                                </span>
+
+                                <br>
+
                                 <input type="text" id="codage" placeholder="ex. xxx prenom lieu"/> <br>
+
                                 <button id="wer-btn" class="results-btns">Calculer le WER/CER</button>
                                 <div id="wer-results"></div>
                             </div>    

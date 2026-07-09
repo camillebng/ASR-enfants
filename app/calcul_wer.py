@@ -165,8 +165,8 @@ def calculer_wer(reference, prediction, codes_users=None):
     mots_ref_alignes.reverse()
     mots_pred_alignes.reverse()
 
-    # --- MODIFICATION DE L'AFFICHAGE ICI ---
-    mots_par_ligne = 10
+
+    mots_par_ligne = 15
     lignes_alignees = []
     for k in range(0, len(mots_ref_alignes), mots_par_ligne):
         bloc_ref = mots_ref_alignes[k:k + mots_par_ligne]

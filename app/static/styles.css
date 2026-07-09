@@ -111,6 +111,59 @@ section{
     color: #8c9699;
 }
 
+/* Tooltips */
+.tooltip-container {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle; 
+    margin-left: 4px; 
+}
+
+/* Icône */
+.tooltip-container svg {
+    color: #8c9699; 
+    transition: color 0.2s ease;
+}
+
+.tooltip-container:hover svg {
+    color: #b87458; 
+}
+
+/* Bulle d'info */
+.tooltip-container::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    z-index: 10;
+    
+
+    bottom: 130%;
+    left: 50%;
+    transform: translateX(-50%);
+    
+
+    background-color: #212529; 
+    color: #ffffff; 
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    line-height: 1.4;
+    
+
+    width: max-content;
+    max-width: 260px;
+    white-space: normal;
+    
+
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.tooltip-container:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-4px); 
+}
+
 #execution-console {
     width: 98%;
     height: 180px;          
@@ -234,7 +287,7 @@ input::file-selector-button:hover{
     margin:10px;
     border-radius: 12px;
     border: 1px solid #536972;
-    padding: 10px 12px;
+    padding: 8px 8px;
     display: inline-flex;
     gap: 5px;
     cursor: pointer;
