@@ -16,3 +16,11 @@ Si vous possédez une carte graphique NVIDIA, cela permettra de réduire les tem
 2. Lancez ensuite `start.bat` pour démarrer le serveur de l'application dans le navigateur.
 
 *Note : si la page s'ouvre sur une erreur, essayez de rafraîchir la page.*
+
+# Prétraitement des fichiers à transcrire
+La présence de longs silences dans les fichiers audio a tendance à générer des hallucinations avec WhisperX. Il est donc conseillé de les diviser en plus petits fichiers pour chaque prise de parole grâce à l'option "Scinder les fichiers".
+
+Cependant, il faut au préalable segmenter les prises de parole à transcrire dans un fichier textgrid. 
+* Seuls les segments **non-vides** seront extraits en .wav séparés : il suffit par exemple d'y insérer une simple lettre pour valider l'extraction.
+* La segmentation doit impérativement se trouver sur le **Tier 1**. 
+
